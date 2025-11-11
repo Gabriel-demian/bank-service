@@ -43,7 +43,7 @@ curl -X GET http://localhost:8080/v1/banks \
 -H "Authorization: Bearer token"
 
 ### Swagger UI:  
-http://localhost:8080/swagger-ui/index.html
+ - http://localhost:8080/swagger-ui/index.html
 
 ##  Estructura del Proyecto
 ```
@@ -89,3 +89,18 @@ com.example.bankservice
         ├── DuplicateResourceException.java
         └── NotFoundException.java
 ```
+
+
+### Endpoint especial: Proxy
+
+- GET /v1/banks/proxy?country=AR
+  - Este endpoint consume su propio endpoint /v1/banks internamente mediante WebClient.
+  Demuestra un patrón de API composition y uso de programación reactiva (o asíncrona) para evitar bloqueos.
+
+
+### Arquitectura
+
+- Arquitectura Hexagonal (Ports & Adapters):
+- Domain: reglas de negocio puras (Bank, BankService, BankRepositoryPort)
+- Application: controladores y DTOs (entrada/salida)
+- Infrastructure: persistencia, seguridad, configuración
