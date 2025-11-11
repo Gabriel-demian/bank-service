@@ -104,3 +104,26 @@ com.example.bankservice
 - Domain: reglas de negocio puras (Bank, BankService, BankRepositoryPort)
 - Application: controladores y DTOs (entrada/salida)
 - Infrastructure: persistencia, seguridad, configuración
+
+---
+
+## Observabilidad y Monitoreo
+
+El servicio incorpora una configuración básica de **observabilidad** lista para entornos reales:
+
+### Logs estructurados
+Los logs se generan en formato **JSON** mediante **Logback** y **Logbook**, lo que permite:
+- Lectura y análisis automático por herramientas como **ELK (Elasticsearch + Logstash + Kibana)** o **Grafana Loki**.
+- Registro de cada request/response HTTP con tiempos y estado.
+- Ofuscación de cabeceras sensibles (`Authorization`, `Set-Cookie`).
+- Niveles de log coherentes (`INFO`, `DEBUG`, `WARN`, `ERROR`).
+
+Ejemplo de log JSON:
+```json
+{
+  "timestamp": "2025-11-11T02:35:00.412Z",
+  "level": "INFO",
+  "logger": "com.example.bankservice.application.controller.BankController",
+  "message": "Bank created id=123e4567-e89b-12d3-a456-426614174000 version=0",
+  "thread": "http-nio-8080-exec-1"
+}
