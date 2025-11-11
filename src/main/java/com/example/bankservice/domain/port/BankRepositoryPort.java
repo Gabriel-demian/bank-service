@@ -17,9 +17,7 @@ public interface BankRepositoryPort {
 
     Optional<Bank> findByBic(String bic);
 
-    /**
-     * Simple list for the exercise; //TODO we can introduce filters/pagination ports.
-     */
+    //TODO we can introduce filters/pagination ports
     List<Bank> findAll();
 
     void deleteById(UUID id);

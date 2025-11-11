@@ -2,6 +2,7 @@ package com.example.bankservice.application.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+
 import java.util.UUID;
 
 /**
@@ -15,4 +16,5 @@ public record BankDto(
         @NotBlank
         @Pattern(regexp = "^[A-Z]{2}$") String country,
         String routingNumber
-) {}
+) {
+}

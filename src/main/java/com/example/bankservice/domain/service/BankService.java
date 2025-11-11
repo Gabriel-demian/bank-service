@@ -4,12 +4,12 @@ import com.example.bankservice.domain.model.Bank;
 import com.example.bankservice.domain.port.BankRepositoryPort;
 import com.example.bankservice.shared.exception.DuplicateResourceException;
 import com.example.bankservice.shared.exception.NotFoundException;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
-
-import org.springframework.stereotype.Service;
 
 /**
  * Validates input, enforces business rules.
@@ -26,7 +26,9 @@ public class BankService {
         this.repository = repository;
     }
 
-    /** Create **/
+    /**
+     * Create
+     **/
     public Bank create(String name, String bic, String country, String routingNumber) {
         validateRequired(name, "name");
         validateRequired(bic, "bic");
@@ -45,7 +47,9 @@ public class BankService {
         return repository.save(bank);
     }
 
-    /** Read **/
+    /**
+     * Read
+     **/
     public Bank get(UUID id) {
         return repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Bank not found: " + id));
@@ -55,7 +59,9 @@ public class BankService {
         return repository.findAll();
     }
 
-    /** Update (full replace semantics) **/
+    /**
+     * Update (full replace semantics)
+     **/
     public Bank update(UUID id, String name, String bic, String country, String routingNumber, long expectedVersion) {
         validateRequired(name, "name");
         validateRequired(bic, "bic");
@@ -96,14 +102,18 @@ public class BankService {
         return repository.save(existing);
     }
 
-    /** Delete **/
+    /**
+     * Delete
+     **/
     public void delete(UUID id) {
         // Ensure exists to return 404 if not
         repository.findById(id).orElseThrow(() -> new NotFoundException("Bank not found: " + id));
         repository.deleteById(id);
     }
 
-    /** Validation helpers **/
+    /**
+     * Validation helpers
+     **/
     private static void validateRequired(String value, String field) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("Field '" + field + "' is required");

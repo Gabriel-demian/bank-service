@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.Map;
@@ -20,7 +21,10 @@ import java.util.function.Function;
 public class JwtService {
 
     @Value("${security.jwt.secret}")
-    private String secret;
+    private String jwtSecret;
+
+    @Value("${security.jwt.expiration-minutes:60}")
+    private long jwtExpirationMinutes;  //TODO agregar vencimiento de token.
 
     public String generateToken(String username) {
         return Jwts.builder()
@@ -59,7 +63,13 @@ public class JwtService {
     }
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        String secret = jwtSecret;
+        byte[] keyBytes;
+        try {
+            keyBytes = Decoders.BASE64.decode(secret);
+        } catch (IllegalArgumentException ex) {
+            keyBytes = secret.getBytes(StandardCharsets.UTF_8);
+        }
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
