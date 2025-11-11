@@ -18,6 +18,16 @@ curl -X GET http://localhost:8080/v1/banks \
 com.example.bankservice
 ├── BankServiceApplication.java
 │
+├── application/                
+│   ├── controller/
+│   │   ├── AuthController.java
+│   │   └── BankController.java
+│   └── dto/
+│       ├── BankApiMapper.java
+│       ├── BankDto.java
+│       ├── BankRequest.java
+│       └── BankResponse.java
+│
 ├── domain/                      
 │   ├── model/                   
 │   │   └── Bank.java
@@ -26,24 +36,24 @@ com.example.bankservice
 │   └── service/                
 │       └── BankService.java
 │
-├── infrastructure/              
-│   ├── repository/
-│   │   └── BankRepositoryAdapter.java
-│   └── config/
-│       ├── PersistenceConfig.java
-│       └── SecurityConfig.java
-│
-├── application/                
-│   ├── controller/
-│   │   └── BankController.java
-│   └── dto/
-│       ├── BankDto.java
-│       └── Mappers.java
+├── infrastructure/      
+│   ├── config/
+│   │   ├── JwtAuthFilter.java
+│   │   ├── JwtService.java
+│   │   ├── PersistenceConfig.java
+│   │   └── SecurityConfig.java        
+│   └── repository/
+│       ├── entity/
+│       │   └── BankJpaEntity.java  
+│       ├── mapper/
+│       │   └── BankJpaEntityMapper.java     
+│       ├── SecurityConfig.java  
+│       └── SecurityConfig.java  
 │
 └── shared/                      
-├── exception/
-│   ├── DuplicateResourceException.java
-│   └── NotFoundException.java
-└── error/
-└── GlobalExceptionHandler.java
+    ├── error/
+    │   └── GlobalExceptionHandler.java
+    └── exception/
+        ├── DuplicateResourceException.java
+        └── NotFoundException.java
 ```

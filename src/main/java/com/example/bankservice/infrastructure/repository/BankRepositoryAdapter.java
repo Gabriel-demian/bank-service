@@ -13,10 +13,10 @@ import java.util.UUID;
 @Repository
 public class BankRepositoryAdapter implements BankRepositoryPort {
 
-    private final SpringDataBankRepository jpa;
+    private final BankRepository jpa;
     private final BankEntityMapper mapper;
 
-    public BankRepositoryAdapter(SpringDataBankRepository jpa, BankEntityMapper mapper) {
+    public BankRepositoryAdapter(BankRepository jpa, BankEntityMapper mapper) {
         this.jpa = jpa;
         this.mapper = mapper;
     }
