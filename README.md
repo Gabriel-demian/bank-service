@@ -1,14 +1,35 @@
-# bank-service
+# Bank Service
 
-## Requisitos previos
+Microservicio REST desarrollado en **Java 21** + **Spring Boot 3.3+**, que implementa un CRUD completo sobre entidades bancarias.  
+Sigue una **arquitectura hexagonal (Ports & Adapters)** y utiliza **H2 en memoria** como base de datos.
+
+---
+
+## Tecnologías principales
+
+- Java 21 (Virtual Threads-ready)
+- Spring Boot 3 (MVC, Data JPA, Validation, Security)
+- H2 Database (en memoria)
+- MapStruct (mapeo DTO ↔ entidad)
+- JWT (autenticación)
+- Swagger / OpenAPI (documentación)
+- Maven
+- Docker / Docker Compose
+
+---
+
+## Cómo ejecutar el servicio
+
+### Requisitos previos
 - Java 21
-- Maven 3.6+
-- Docker (for running services locally)
+- Maven 3.9+
+- Docker y Docker Compose
 
-### Para arrancar el servicio:
-```sh
+### Build y ejecución
+```bash
 docker compose up --build
 ```
+
 
 ## Quick test para security
 
@@ -21,9 +42,10 @@ curl -X POST http://localhost:8080/auth/login \
 curl -X GET http://localhost:8080/v1/banks \
 -H "Authorization: Bearer token"
 
-### Swagger:  http://localhost:8080/swagger-ui/index.html
+### Swagger UI:  
+http://localhost:8080/swagger-ui/index.html
 
-## 📂 Estructura del Proyecto
+##  Estructura del Proyecto
 ```
 com.example.bankservice
 ├── BankServiceApplication.java
