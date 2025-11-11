@@ -25,3 +25,27 @@ spring:
 security:
   jwt:
     secret: secret-key
+    expiration-minutes: 60
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+
+logbook:
+  exclude:
+    - /actuator/**
+    - /swagger-ui/**
+    - /v3/api-docs/**
+  obfuscate:
+    headers:
+      - Authorization
+      - Set-Cookie
+  strategy: body-only-if-status-at-least
+  minimum-status: 400
