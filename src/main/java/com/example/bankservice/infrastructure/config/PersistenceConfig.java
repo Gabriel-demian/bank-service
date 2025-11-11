@@ -1,8 +1,8 @@
 package com.example.bankservice.infrastructure.config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
@@ -12,8 +12,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class PersistenceConfig {
 
     @Bean
-    WebClient webClient(@Value("${app.self-base-url}") String baseUrl) {
-        return WebClient.builder().baseUrl(baseUrl).build();
+    WebClient webClient(Environment env) {
+        String port = env.getProperty("server.port", "8080");
+        String base = env.getProperty("app.self-base-url", "http://localhost:" + port);
+        return WebClient.builder().baseUrl(base).build();
     }
 
 }
