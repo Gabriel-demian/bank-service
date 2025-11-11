@@ -1,5 +1,14 @@
 # bank-service
 
+## Requisitos previos
+- Java 21
+- Maven 3.6+
+- Docker (for running services locally)
+
+### Para arrancar el servicio:
+```sh
+docker compose up --build
+```
 
 ## Quick test para security
 
@@ -12,6 +21,7 @@ curl -X POST http://localhost:8080/auth/login \
 curl -X GET http://localhost:8080/v1/banks \
 -H "Authorization: Bearer token"
 
+### Swagger:  http://localhost:8080/swagger-ui/index.html
 
 ## 📂 Estructura del Proyecto
 ```
