@@ -116,13 +116,17 @@ public class BankController {
 
     @Operation(summary = "Proxy that self-calls GET /v1/banks (demo of API composition)")
     @GetMapping("/proxy")
-    public ResponseEntity<String> proxy(@RequestParam(required = false) String country) {
+    public ResponseEntity<String> proxy(
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
+            @RequestParam(required = false) String country) {
+
         String uri = (country == null || country.isBlank())
                 ? "/v1/banks"
                 : "/v1/banks?country=" + country;
 
         String body = webClient.get()
                 .uri(uri)
+                .header(HttpHeaders.AUTHORIZATION, authorization)
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();

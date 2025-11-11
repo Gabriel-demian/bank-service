@@ -17,3 +17,9 @@ spring:
 security:
   jwt:
     secret: c2VjcmV0LWtleS1taW4tMzItY2hhcnMtc2VjcmV0LXNob3VsZC1iZS1sb25n
+
+server:
+  port: 18080
+
+app:
+  self-base-url: http://localhost:18080

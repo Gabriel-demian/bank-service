@@ -12,10 +12,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class PersistenceConfig {
 
     @Bean
-    public WebClient webClient(@Value("${server.port:8080}") int port) {
-        // baseUrl al mismo servicio (self-call)
-        return WebClient.builder()
-                .baseUrl("http://localhost:" + port)
-                .build();
+    WebClient webClient(@Value("${app.self-base-url}") String baseUrl) {
+        return WebClient.builder().baseUrl(baseUrl).build();
     }
+
 }
