@@ -1,0 +1,10 @@
+services:
+  bankservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bankservice:local
+    container_name: bankservice
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
