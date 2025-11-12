@@ -75,7 +75,7 @@ public class BankController {
         return ResponseEntity.ok(mapper.toResponse(bank));
     }
 
-    @Operation(summary = "List banks (optional in-memory filter by country)")
+    @Operation(summary = "List banks")
     @GetMapping
     public ResponseEntity<List<BankResponse>> list(@RequestParam(required = false) String country) {
         log.debug("GET /v1/banks?country={}", country);
@@ -131,7 +131,7 @@ public class BankController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Proxy that self-calls GET /v1/banks (demo of API composition)")
+    @Operation(summary = "Proxy that self-calls GET /v1/banks")
     @GetMapping("/proxy")
     public ResponseEntity<String> proxy(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
