@@ -25,11 +25,16 @@ Sigue una **arquitectura hexagonal (Ports & Adapters)** y utiliza **H2 en memori
 - Maven 3.9+
 - Docker y Docker Compose
 
-### Build y ejecución
+
+### Cómo correr local sin Docker
+```bash
+mvn spring-boot:run
+```
+
+### Build y ejecución con Docker
 ```bash
 docker compose up --build
 ```
-
 
 ## Quick test para security
 
@@ -50,60 +55,74 @@ curl -X GET http://localhost:8080/v1/banks \
 com.example.bankservice
 ├── BankServiceApplication.java
 │
-├── application/                
-│   ├── controller/
-│   │   ├── AuthController.java
-│   │   └── BankController.java
-│   └── dto/
-│       ├── BankApiMapper.java
-│       ├── BankDto.java
-│       ├── BankRequest.java
-│       └── BankResponse.java
-│
-├── domain/                      
-│   ├── model/                   
-│   │   └── Bank.java
-│   ├── port/                    
-│   │   └── BankRepositoryPort.java
-│   └── service/                
+├── application/
+│   ├── dto/
+│   │   └── BankDto.java
+│   ├── mapper/
+│   │   └── BankAppMapper.java        // Bank <-> BankDto
+│   └── service/
 │       └── BankService.java
 │
-├── infrastructure/      
+├── domain/
+│   ├── model/
+│   │   └── Bank.java
+│   └── port/
+│       └── BankRepositoryPort.java
+│
+├── infrastructure/
 │   ├── config/
 │   │   ├── JwtAuthFilter.java
 │   │   ├── JwtService.java
 │   │   ├── PersistenceConfig.java
-│   │   └── SecurityConfig.java        
+│   │   └── SecurityConfig.java
+│   │
+│   ├── web/
+│   │   ├── controller/
+│   │   │   ├── AuthController.java
+│   │   │   └── BankController.java
+│   │   └── dto/
+│   │       ├── BankRequest.java
+│   │       ├── BankResponse.java
+│   │       └── BankApiMapper.java    // Request/Response <-> BankDto
+│   │
 │   └── repository/
 │       ├── entity/
-│       │   └── BankJpaEntity.java  
+│       │   └── BankJpaEntity.java
 │       ├── mapper/
-│       │   └── BankJpaEntityMapper.java     
-│       ├── SecurityConfig.java  
-│       └── SecurityConfig.java  
+│       │   └── BankEntityMapper.java // Bank <-> BankJpaEntity
+│       └── adapter/
+│           └── BankRepositoryAdapter.java  // implements BankRepositoryPort
 │
-└── shared/                      
+└── shared/
     ├── error/
     │   └── GlobalExceptionHandler.java
     └── exception/
         ├── DuplicateResourceException.java
         └── NotFoundException.java
+
 ```
 
 
 ### Endpoint especial: Proxy
 
 - GET /v1/banks/proxy?country=AR
-  - Este endpoint consume su propio endpoint /v1/banks internamente mediante WebClient.
-  Demuestra un patrón de API composition y uso de programación reactiva (o asíncrona) para evitar bloqueos.
+  - Este endpoint utiliza `WebClient` para consumir el propio API del servicio.  
+    Demuestra un patrón de **API composition**, manteniendo el estilo no bloqueante interno del client 
+    aunque el controlador exponga una API síncrona tradicional.
 
 
 ### Arquitectura
 
-- Arquitectura Hexagonal (Ports & Adapters):
-- Domain: reglas de negocio puras (Bank, BankService, BankRepositoryPort)
-- Application: controladores y DTOs (entrada/salida)
-- Infrastructure: persistencia, seguridad, configuración
+El servicio implementa **Arquitectura Hexagonal (Ports & Adapters)**:
+
+- **Domain**: reglas de negocio puras
+  - `Bank`, `BankRepositoryPort`
+
+- **Application (Use Cases)**: orquestación, lógica de casos de uso
+  - `BankService`, `BankDto`, `BankAppMapper`
+
+- **Infrastructure**: controladores HTTP, persistencia JPA, seguridad, JWT, config
+  - Controllers, DTOs de transporte, WebClient, repositorio JPA, JWT, filtros, etc.
 
 ---
 
