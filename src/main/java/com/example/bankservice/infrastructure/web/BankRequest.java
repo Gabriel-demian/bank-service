@@ -1,4 +1,4 @@
-package com.example.bankservice.application.dto;
+package com.example.bankservice.infrastructure.web;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

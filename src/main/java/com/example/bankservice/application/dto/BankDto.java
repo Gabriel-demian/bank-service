@@ -1,8 +1,6 @@
 package com.example.bankservice.application.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -10,11 +8,12 @@ import java.util.UUID;
  */
 public record BankDto(
         UUID id,
-        @NotBlank String name,
-        @NotBlank
-        @Pattern(regexp = "^[A-Z0-9]{8}([A-Z0-9]{3})?$") String bic,
-        @NotBlank
-        @Pattern(regexp = "^[A-Z]{2}$") String country,
-        String routingNumber
+        String name,
+        String bic,
+        String country,
+        String routingNumber,
+        long version,
+        Instant createdAt,
+        Instant updatedAt
 ) {
 }
