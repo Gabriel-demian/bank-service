@@ -60,7 +60,7 @@ public class BankService {
     }
 
     /**
-     * Update (full replace semantics)
+     * Update
      **/
     public Bank update(UUID id, String name, String bic, String country, String routingNumber, long expectedVersion) {
         validateRequired(name, "name");
@@ -72,7 +72,6 @@ public class BankService {
         Bank existing = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Bank not found: " + id));
 
-        // Optimistic version check at domain level (DB enforces real version)
         if (existing.getVersion() != expectedVersion) {
             throw new IllegalStateException("Version conflict. Expected=" + expectedVersion + " Actual=" + existing.getVersion());
         }
