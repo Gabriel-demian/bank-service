@@ -1,10 +1,7 @@
-package com.example.bankservice.application.controller;
+package com.example.bankservice.infrastructure.web;
 
-import com.example.bankservice.application.dto.BankApiMapper;
-import com.example.bankservice.application.dto.BankRequest;
-import com.example.bankservice.application.dto.BankResponse;
-import com.example.bankservice.domain.model.Bank;
-import com.example.bankservice.domain.service.BankService;
+import com.example.bankservice.application.dto.BankDto;
+import com.example.bankservice.application.service.BankService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,8 +28,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
-
-import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequestMapping("/v1/banks")
@@ -61,28 +56,33 @@ public class BankController {
     @PostMapping
     public ResponseEntity<BankResponse> create(@Valid @RequestBody BankRequest req) {
         log.info("POST /v1/banks name='{}' country='{}' bic='{}'", req.name(), req.country(), req.bic());
-        Bank created = service.create(req.name(), req.bic(), req.country(), req.routingNumber());
-        URI location = URI.create("/v1/banks/" + created.getId());
-        log.info("Bank created id={} version={}", created.getId(), created.getVersion());
-        return ResponseEntity.created(location).body(mapper.toResponse(created));
+
+        BankDto input = mapper.toDto(req);
+        BankDto created = service.create(input);
+
+        URI location = URI.create("/v1/banks/" + created.id());
+        log.info("Bank created id={} version={}", created.id(), created.version());
+
+        BankResponse response = mapper.toResponse(created);
+        return ResponseEntity.created(location).body(response);
     }
 
     @Operation(summary = "Get a bank by id")
     @GetMapping("/{id}")
     public ResponseEntity<BankResponse> get(@PathVariable UUID id) {
         log.debug("GET /v1/banks/{}", id);
-        Bank bank = service.get(id);
-        return ResponseEntity.ok(mapper.toResponse(bank));
+        BankDto dto = service.get(id);
+        return ResponseEntity.ok(mapper.toResponse(dto));
     }
 
     @Operation(summary = "List banks")
     @GetMapping
     public ResponseEntity<List<BankResponse>> list(@RequestParam(required = false) String country) {
         log.debug("GET /v1/banks?country={}", country);
-        List<BankResponse> out = service.list().stream()
-                .filter(b -> country == null || country.equalsIgnoreCase(b.getCountry()))
+        List<BankDto> dtos = service.list(country);
+        List<BankResponse> out = dtos.stream()
                 .map(mapper::toResponse)
-                .collect(toList());
+                .toList();
         log.info("List banks -> {} results (country={})", out.size(), country);
         return ResponseEntity.ok(out);
     }
@@ -113,13 +113,15 @@ public class BankController {
         log.info("PUT /v1/banks/{} expectedVersion={} name='{}' bic='{}'",
                 id, expectedVersion, req.name(), req.bic());
 
-        Bank updated = service.update(
-                id, req.name(), req.bic(), req.country(), req.routingNumber(), expectedVersion);
+        BankDto input = mapper.toDto(req);
+        BankDto updated = service.update(id, expectedVersion, input);
 
-        log.info("Bank updated id={} newVersion={}", id, updated.getVersion());
+        BankResponse response = mapper.toResponse(updated);
+
+        log.info("Bank updated id={} newVersion={}", id, response.version());
         return ResponseEntity.ok()
-                .eTag("\"" + updated.getVersion() + "\"")
-                .body(mapper.toResponse(updated));
+                .eTag("\"" + response.version() + "\"")
+                .body(response);
     }
 
     @Operation(summary = "Delete a bank by id")

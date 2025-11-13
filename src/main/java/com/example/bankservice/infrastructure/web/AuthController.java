@@ -1,4 +1,4 @@
-package com.example.bankservice.application.controller;
+package com.example.bankservice.infrastructure.web;
 
 import com.example.bankservice.infrastructure.config.JwtService;
 import jakarta.validation.Valid;

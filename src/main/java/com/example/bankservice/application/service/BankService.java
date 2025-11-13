@@ -1,5 +1,7 @@
-package com.example.bankservice.domain.service;
+package com.example.bankservice.application.service;
 
+import com.example.bankservice.application.dto.BankDto;
+import com.example.bankservice.application.mapper.BankAppMapper;
 import com.example.bankservice.domain.model.Bank;
 import com.example.bankservice.domain.port.BankRepositoryPort;
 import com.example.bankservice.shared.exception.DuplicateResourceException;
@@ -21,15 +23,20 @@ public class BankService {
     private static final Pattern COUNTRY_PATTERN = Pattern.compile("^[A-Z]{2}$");
 
     private final BankRepositoryPort repository;
+    private final BankAppMapper mapper;
 
-    public BankService(BankRepositoryPort repository) {
+    public BankService(BankRepositoryPort repository, BankAppMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
-    /**
-     * Create
-     **/
-    public Bank create(String name, String bic, String country, String routingNumber) {
+    // CREATE
+    public BankDto create(BankDto dto) {
+        String name = dto.name();
+        String bic = dto.bic();
+        String country = dto.country();
+        String routingNumber = dto.routingNumber();
+
         validateRequired(name, "name");
         validateRequired(bic, "bic");
         validateRequired(country, "country");
@@ -40,29 +47,37 @@ public class BankService {
             throw new DuplicateResourceException("BIC already exists: " + bic);
         });
         repository.findByNameAndCountry(name, country).ifPresent(b -> {
-            throw new DuplicateResourceException("Bank with same name and country already exists: " + name + ", " + country);
+            throw new DuplicateResourceException(
+                    "Bank with same name and country already exists: " + name + ", " + country);
         });
 
         Bank bank = Bank.newBank(name, bic, country, routingNumber);
-        return repository.save(bank);
+        Bank saved = repository.save(bank);
+        return mapper.toDto(saved);
     }
 
-    /**
-     * Read
-     **/
-    public Bank get(UUID id) {
-        return repository.findById(id)
+    // READ
+    public BankDto get(UUID id) {
+        Bank bank = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Bank not found: " + id));
+        return mapper.toDto(bank);
     }
 
-    public List<Bank> list() {
-        return repository.findAll();
+    public List<BankDto> list(String country) {
+        return repository.findAll().stream()
+                .filter(b -> country == null || country.isBlank()
+                        || country.equalsIgnoreCase(b.getCountry()))
+                .map(mapper::toDto)
+                .toList();
     }
 
-    /**
-     * Update
-     **/
-    public Bank update(UUID id, String name, String bic, String country, String routingNumber, long expectedVersion) {
+    // UPDATE
+    public BankDto update(UUID id, long expectedVersion, BankDto dto) {
+        String name = dto.name();
+        String bic = dto.bic();
+        String country = dto.country();
+        String routingNumber = dto.routingNumber();
+
         validateRequired(name, "name");
         validateRequired(bic, "bic");
         validateRequired(country, "country");
@@ -73,10 +88,10 @@ public class BankService {
                 .orElseThrow(() -> new NotFoundException("Bank not found: " + id));
 
         if (existing.getVersion() != expectedVersion) {
-            throw new IllegalStateException("Version conflict. Expected=" + expectedVersion + " Actual=" + existing.getVersion());
+            throw new IllegalStateException("Version conflict. Expected=" + expectedVersion
+                    + " Actual=" + existing.getVersion());
         }
 
-        // Enforce uniqueness if bic/name/country changed
         if (!Objects.equals(existing.getBic(), bic)) {
             repository.findByBic(bic).ifPresent(other -> {
                 if (!other.getId().equals(id)) {
@@ -84,10 +99,12 @@ public class BankService {
                 }
             });
         }
-        if (!Objects.equals(existing.getName(), name) || !Objects.equals(existing.getCountry(), country)) {
+        if (!Objects.equals(existing.getName(), name)
+                || !Objects.equals(existing.getCountry(), country)) {
             repository.findByNameAndCountry(name, country).ifPresent(other -> {
                 if (!other.getId().equals(id)) {
-                    throw new DuplicateResourceException("Bank with same name and country already exists: " + name + ", " + country);
+                    throw new DuplicateResourceException(
+                            "Bank with same name and country already exists: " + name + ", " + country);
                 }
             });
         }
@@ -98,15 +115,14 @@ public class BankService {
         existing.setRoutingNumber(routingNumber);
         existing.touchUpdatedAt();
 
-        return repository.save(existing);
+        Bank saved = repository.save(existing);
+        return mapper.toDto(saved);
     }
 
-    /**
-     * Delete
-     **/
+    // DELETE
     public void delete(UUID id) {
-        // Ensure exists to return 404 if not
-        repository.findById(id).orElseThrow(() -> new NotFoundException("Bank not found: " + id));
+        repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Bank not found: " + id));
         repository.deleteById(id);
     }
 

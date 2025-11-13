@@ -1,4 +1,4 @@
-package com.example.bankservice.application.controller;
+package com.example.bankservice.infrastructure.web;
 
 import com.example.bankservice.testutil.TestAuth;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class BankControllerIT {
+class BankControllerTest {
 
     @Autowired
     MockMvc mvc;
@@ -96,15 +96,15 @@ class BankControllerIT {
                 .andExpect(jsonPath("$.version", is(1)))
                 .andReturn();
 
-        // 5) UPDATE con versión vieja → debe fallar (409/400 según tu handler)
+        // 5) UPDATE con versión vieja → falla
         mvc.perform(put("/v1/banks/{id}", id)
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
-                        .header(HttpHeaders.IF_MATCH, "\"0\"") // desactualizado
+                        .header(HttpHeaders.IF_MATCH, "\"0\"")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(updateBody))
-                .andExpect(status().is4xxClientError()); // idealmente 409
+                .andExpect(status().is4xxClientError());
 
-        // 6) PROXY (autollamada a /v1/banks)
+        // 6) PROXY
         mvc.perform(get("/v1/banks/proxy")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isOk())
